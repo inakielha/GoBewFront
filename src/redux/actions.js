@@ -33,6 +33,20 @@ export const GET_CATEGORIES = createAsyncThunk(
         const response = await fetch(`${REACT_APP_APIURL}categories`)
         return await response.json()
     })
+
+export const GET_PRODUCTS_BYCATEGORY = createAction(
+    'GET_PRODUCTS_BYCATEGORY', (products) => {
+        return {
+            payload: products
+        }
+    }
+)
+export const GET_HIGHLIGHTED = createAsyncThunk(
+    'GET_HIGHLIGHTED', async () => {
+        const response = await fetch(`${REACT_APP_APIURL}product/highlight`)
+
+        return await response.json()
+    })
 export const GET_PRODUCTS_BYCATEGORY = createAction(
     'GET_PRODUCTS_BYCATEGORY', (products) => {
         return {
