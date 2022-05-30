@@ -14,11 +14,17 @@ export default function ProductCard({productName, productPrice, productStock, pr
                         return <img className={styles.img} src={REACT_APP_CLOUDINARY_RES + i.imageName} alt={i.imageAlt} key={i.imageName}/>
                     }
                 })
+<<<<<<< HEAD
+            }
+            <p>{"$" + productPrice}</p>
+            {/* <span>{productStock}</span> */}
+=======
                }
                 <h3>{productName}</h3>
                 <p>$ {productPrice.toLocaleString( {style: 'currency',currency: 'INR', minimumFractionDigits: 2})}</p>
             </div>
             </Link>
+>>>>>>> b1bace45dc2f70569d01d40e8f301bd2703ad670
         </div>
     )
 }
