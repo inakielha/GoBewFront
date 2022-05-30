@@ -42,9 +42,4 @@ export const ORDER_PRODUCTS = createAction('ORDER_PRODUCTS', (productsSorted) =>
         payload: productsSorted
     }
 })
-export const CLEAN_UP_DETAILS = createAction('CLEAN_UP_DETAILS', () => {
-    return {
-        //payload tiene que existir para que el reducer funcione    
-        payload: {}
-    }
-})
+
