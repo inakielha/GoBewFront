@@ -1,25 +1,21 @@
-
-import './App.css';
+import React from 'react'
 import { Route, Routes } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { GET_PRODUCTS } from './redux/actions';
-import { useEffect } from 'react';
+import "./scss/main.scss";
 import Nav from './components/nav/Nav';
 import ProductCardContainer from './components/mainContent/ProductCardContainer';
 import CreationForm from './admin/components/products/CreationForm';
+import ProductDetailContainer from './components/productDetail/ProductDetailContainer';
+import NavBarDetail from './components/productDetail/NavBarDetail';
+// import CategoriesNew from './components/nav/categories/CategoriesNew.jsx';
 function App() {
-  const dispatch = useDispatch()
-  const { products } = useSelector(state => state.clientReducer)
 
-  useEffect(() => {
-    dispatch(GET_PRODUCTS())
+  // const [ViewCategories, setViewCategories] = useState(true);
 
-  }, [dispatch])
-  console.log(products)
   return (
-    <div className="App">
+    <div >
       <Routes>
-        <Route exact path='/' element={<><Nav />, <ProductCardContainer /></>} />
+        <Route exact path='/' element={<><Nav /> <ProductCardContainer /></>} />
+        <Route exact path='/productDetail/:id' element={<><NavBarDetail/> <ProductDetailContainer /> </>} />
         <Route exact path='/admin/new' element={<CreationForm />} />
       </Routes>
     </div>
