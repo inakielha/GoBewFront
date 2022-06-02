@@ -11,9 +11,9 @@ import { Link } from 'react-router-dom'
 
 const Nav = ({ showSearch, showCategories }) => {
     const userResponse = useSelector(store => store.clientReducer.userResponse)
-    if(userResponse.ok === true){
+    if (userResponse.ok === true) {
         var user = userResponse.userFirstName
-    }else{
+    } else {
         user = 'Acceso'
     }
     return (
