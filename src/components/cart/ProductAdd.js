@@ -29,7 +29,7 @@ const ProductAdd = ({ stock, price, product }) => {
         dispatch(ADD_TO_CART(product, localCount))
         dispatch(SET_TOTAL(totalCart + (localCount * price)))
         setLocalCount(1)
-        toast.pink(
+        toast.success(
             `${product.productName} agregado al carrito`,
         )
         if (userId) {
