@@ -8,7 +8,7 @@ import LogInGoogle from './LogInGoogle.jsx';
 
 const Login = () => {
     const navigate = useNavigate()
-    const { userResponse } = useSelector(store => store.clientReducer)
+    const { userResponse, cart } = useSelector(store => store.clientReducer)
     const [user, setUser] = useState({
         userEmail: '',
         userPassword: ''
@@ -42,6 +42,7 @@ const Login = () => {
             })
             navigate("/")
         }
+
     }
 
     if (userResponse.ok === '') {
@@ -54,7 +55,6 @@ const Login = () => {
     }
     useEffect(() => {
         dispatch(CHECK_LOGIN())
-
     }, [])
 
 
