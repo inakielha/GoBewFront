@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import validate from './validate.js';
-import { POST_USER, CLEAN_USER_RESPONSE, CHECK_LOGIN } from '../../redux/actions';
+import { CHECK_LOGIN, LOG_IN_USER } from '../../redux/actions';
 import { Link, useNavigate } from 'react-router-dom';
 import LogInGoogle from './LogInGoogle.jsx';
 
 
 const Login = () => {
+    let invalido = ""
     const navigate = useNavigate()
     const { userResponse, cart } = useSelector(store => store.clientReducer)
     const [user, setUser] = useState({
@@ -15,12 +16,14 @@ const Login = () => {
     })
     const [errors, setErrors] = useState({});
     const dispatch = useDispatch()
+    if (userResponse.msg === "Usuario no encontrado." || userResponse.msg === 'Password incorrecta' ) invalido = "invalido"
 
     const handleInput = async (e) => {
         setUser({
             ...user,
             [e.target.name]: e.target.value
         })
+        invalido = false
 
         let objError = validate({
             ...user,
@@ -28,24 +31,23 @@ const Login = () => {
         });
         setErrors(objError);
     }
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!Object.values(user).includes('') && Object.keys(errors).length === 0) {
-            dispatch(POST_USER(user))
+            dispatch(LOG_IN_USER(user))
+            userResponse.ok ? navigate("/") : ""
             setUser({
                 userEmail: '',
                 userPassword: ''
             })
 
         }
-
+        
     }
-
+    
     useEffect(() => {
         dispatch(CHECK_LOGIN())
     }, [])
-
 
     return (
         <form onSubmit={handleSubmit} className="loginForm">
@@ -57,11 +59,8 @@ const Login = () => {
 
                 {Object.values(errors).length > 0 && <p className="loginForm__errors">{Object.values(errors)[0]}</p>}
                 <div>
-                    {userResponse.ok === false && <p> Usuario o contraseña invalido</p>}
-                    {userResponse.ok === true && <div >
-                        <h3 > Has iniciado sesión con exito </h3>
-                        <Link to="/" ><button> Continuar</button></Link>
-                    </div>}
+                    {invalido && <p> Usuario o contraseña invalido</p>}
+                    {userResponse.ok && navigate("/")}
                 </div>
                 <div className='loginForm__login--btn-container'>
                     <button type='submit' className="loginForm__login--btn">Ingresar</button>
