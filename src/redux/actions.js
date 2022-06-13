@@ -664,6 +664,14 @@ export const LOG_OUT = createAction(
         }
     }
 )
+
+export const GET_FAQS = createAsyncThunk(
+    'GET_FAQS', async (id) => {
+        const response = await fetch(`${REACT_APP_APIURL}faqs`)
+        return await response.json()
+    }
+)
+
 export const SEARCH_BY_ID = createAsyncThunk("SEARCH_BY_ID", async (id) => {
     try {
         const res = await axios.get(`${REACT_APP_APIURL}users/${id}`)
@@ -720,3 +728,4 @@ export const SEARCH_DIRECTION_BY_ID = createAsyncThunk("SEARCH_DIRECTION_BY_ID",
 //                     userId: '',
 //                 }
 //             }
+
