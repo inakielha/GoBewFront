@@ -12,7 +12,6 @@ const OrderDetailContainer = () => {
     const dispatch = useDispatch()
     const [orderData, setOrderData] = useState({})
     const [addressData, setAddressData] = useState({})
-
     const [rev, setRev] = useState([])
     useEffect(() => {
         dispatch(CHECK_LOGIN())
@@ -45,12 +44,11 @@ const OrderDetailContainer = () => {
         }
 
     }, [orderData])
-
     useEffect(() => {
         fetch(`${REACT_APP_APIURL}reviews/byOrder/${id}`)
             .then(res => res.json())
             .then(data => setRev(data.reviews))
-            .catch(err => console.log(err))
+            .catch(err => err)
     }, [id])
 
     return (

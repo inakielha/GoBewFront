@@ -25,7 +25,7 @@ export default function ProductDetailContainer() {
             .then(data => {
                 setReviews(data)
             })
-            .catch(err => console.log(err))
+            .catch(err => err)
     }, [id])
     return (
         <ProductDetail product={product} reviews={reviews.reviews} />

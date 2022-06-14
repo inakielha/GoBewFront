@@ -5,7 +5,6 @@ import Nav from './components/nav/Nav';
 import ProductDetailContainer from './components/productDetail/ProductDetailContainer';
 import CartContainer from './components/cart/CartContainer';
 import Login from './components/login/Login'
-// import LogInGoogle from './components/login/LogInGoogle';
 import CreateUserForm from './components/login/CreateUserForm';
 import { ToastContainer } from 'react-toastify';
 import MainContentContainer from './components/mainContent/MainContentContainer';
@@ -16,17 +15,11 @@ import OrderDetailContainer from './components/order/OrderDetailContainer';
 import AllOrdersContainer from './components/order/AllOrdersContainer';
 import ReviewsFormContainer from './components/reviews/ReviewsFormContainer';
 import UserProfile from './components/login/UserProfile';
-import OrderDetailContainer from './components/order/OrderDetailContainer';
-import AllOrdersContainer from './components/order/AllOrdersContainer';
 import Faqs from './components/faq/Faqs';
 import { ChangePassword } from './components/login/ChangePassword';
 import { RememberPassword } from './components/login/RememberPassword';
 
-// import CategoriesNew from './components/nav/categories/CategoriesNew.jsx';
 function App() {
-
-  // const [ViewCategories, setViewCategories] = useState(true);
-
   return (
     <>
       <Nav />
@@ -47,7 +40,6 @@ function App() {
         <Route exact path='/faqs' element={<> <Faqs /></>} />
         <Route path='/reset/:userId/:hash/:userEmail' element={<ChangePassword />} />
         <Route path='/rememberPass' element={<RememberPassword/> }/>
-
       </Routes>
       <ToastContainer
         position="top-right"
