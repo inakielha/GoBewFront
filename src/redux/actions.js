@@ -649,6 +649,15 @@ export const LOG_OUT = createAction(
     }
 )
 
+export const POST_USER = createAsyncThunk(
+    'POST_USER', async (user) => {
+        const response = await axios.post(`${REACT_APP_APIURL}users/auth`, user)
+        localStorage.removeItem('token')
+        localStorage.setItem('token', response.data.token)
+        return await response.data
+    }
+)
+
 export const GET_FAQS = createAsyncThunk(
     'GET_FAQS', async (id) => {
         const response = await fetch(`${REACT_APP_APIURL}faqs`)
