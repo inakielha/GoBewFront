@@ -86,14 +86,123 @@ export const CLEAN_CART = createAction('CLEAN_CART', () => {
     }
 })
 
-export const POST_USER = createAsyncThunk(
-    'POST_USER', async (user) => {
-        const response = await axios.post(`${REACT_APP_APIURL}users/auth`, user)
-        localStorage.removeItem('token')
-        localStorage.setItem('token', response.data.token)
-        return await response.data
+export const LOG_IN_USER = createAsyncThunk(
+    'LOG_IN_USER', async (user) => {
+        try {
+            //!USUARIO SE LOGUEA
+            const response = await axios.post(`${REACT_APP_APIURL}users/auth`, user)
+            localStorage.removeItem('token')
+            localStorage.setItem('token', response.data.token)
+            //!BUSCAMOS EL TOKEN 
+            let token = localStorage.getItem('token')
+            //!WE CHECK IF THERE'S SOMETHING TO MERGE
+            let localCart = localStorage.getItem('cart')
+            if (localCart) {
+                localCart = JSON.parse(localCart)
+                //! WE LOOK FOR THE CART AND CHECK IF IT HAS THE SAME SOMETHING
+                const resp = await fetch(`${REACT_APP_APIURL}payments/order/carrito/${response.data.userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-token': token
+                    }
+                })
+                const body = await resp.json()
+                //!IF CART EXIST AT LOCAL STORAGE && DOESN'T EXIST AT THE DB WE CREATE IT
+                if (!body.ok) {
+                    let totalCartStorage = localStorage.getItem('totalCart')
+                    if (totalCartStorage) { JSON.parse(totalCartStorage) }
+                    const createCartResponse = await fetch(`${REACT_APP_APIURL}payments/order`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-token': token
+                        },
+                        body: JSON.stringify({
+                            userId: response.data.userId,
+                            orderTotal: totalCartStorage || localCart.reduce((a, b) => a + b.product.price * b.quantity, 0),
+                            shippingAddressId: '',
+                            cart: localCart?.map(item => ({
+                                _id: item._id,
+                                quantity: item.quantity,
+                                productPrice: item.productPrice,
+                                productName: item.productName
+                            })),
+                        })
+                    })
+                    const createCartBody = await createCartResponse.json()
+                    if (createCartBody.ok) {
+                        localStorage.removeItem('cart')
+                        localStorage.removeItem('totalCart')
+                    }
+                    return response.data
+                } else if (body.ok) {
+                    //!IF CART EXIST AT LOCAL STORAGE &&  EXIST AT THE DB WE UPDATE IT
+                    let cart = [...body.obj.cart]
+                    let totalCartStorage = localStorage.getItem('totalCart')
+                    if (totalCartStorage && totalCartStorage !== 'undefined') {
+                        totalCartStorage = JSON.parse(totalCartStorage)
+                    }
+                    localCart.forEach(localItem => {
+                        let itemExist = cart.find(item => item.productId === localItem._id)
+                        if (itemExist) {
+                            itemExist.productCant += localItem.quantity
+                        }
+                        else {
+                            cart.push(localItem)
+                        }
+                    })
+
+                    localStorage.setItem('totalCart', JSON.stringify(totalCartStorage))
+                    localStorage.setItem('cart', JSON.stringify(cart))
+                    const updatedCart = await fetch(`${REACT_APP_APIURL}payments/order/updatecarrito`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-token': token
+                        },
+                        body: JSON.stringify({
+                            userId: body.obj.userId,
+                            orderTotal: body.obj.orderTotal + totalCartStorage,
+                            orderId: body.obj.orderId,
+                            shippingAddressId: '',
+                            cart: cart?.map(item => ({
+                                _id: item.productId || item._id,
+                                quantity: item.productCant || item.quantity,
+                                productPrice: item.productPrice,
+                                productName: item.productName
+                            })),
+                        })
+                    })
+                    const updatedCartBody = await updatedCart.json()
+                    if (updatedCartBody.ok) {
+                        localStorage.removeItem('cart')
+                        localStorage.removeItem('totalCart')
+                    }
+                }
+                return response.data
+            } else {
+                return response.data
+            }
+        } catch (e) {
+            return {
+                ok: false,
+                msg: e.response.data.msg,
+                userId: "",
+                UserfirstName: ""
+            }
+        }
     }
 )
+
+
+
+
+
+
+
+
+
 export const CLEAN_USER_RESPONSE = createAction('CLEAN_USER_RESPONSE', () => {
     return { payload: { ok: '' } }
 
@@ -102,7 +211,6 @@ export const CREATION_USER_LOGIN = createAsyncThunk(
     "CREATION_USER_LOGIN", async (user) => {
         try {
             const response = await axios.post(`${REACT_APP_APIURL}users/authGoogle`, user)
-            console.log(response.data)
             if (response.data.ok) {
                 localStorage.setItem('token', response.data.token)
                 return {
@@ -113,7 +221,6 @@ export const CREATION_USER_LOGIN = createAsyncThunk(
                 }
             }
             else {
-                console.log("entro");
                 return {
                     payload: {
                         token: '',
@@ -138,13 +245,13 @@ export const CREATION_USER_LOGIN = createAsyncThunk(
 )
 export const CREATION_USERFORM = createAsyncThunk(
     "CREATION_USERFORM", async (user) => {
-        console.log(user)
-        const response = await axios.post(`${REACT_APP_APIURL}users/new`, user)
-        console.log(response.data)
         try {
+            const response = await axios.post(`${REACT_APP_APIURL}users/new`, user)
             if (response.data.ok) {
                 localStorage.setItem('token', response.data.token)
                 return {
+                    ok: true,
+                    msg: "ok",
                     userId: response.data.userId,
                     userFirstName: response.data.userFirstName,
                     tokenInitDate: new Date().getTime(),
@@ -152,19 +259,19 @@ export const CREATION_USERFORM = createAsyncThunk(
                 }
             }
             else {
-                console.log("entro");
                 return {
                     payload: {
                         token: '',
-                        ok: ""
+                        ok: "",
                     }
                 }
             }
 
         } catch (error) {
+
             return {
                 ok: false,
-                msg: 'Token no válido',
+                msg: error.response.data.errors,
                 userId: '',
                 userEmail: '',
                 userFirstName: '',
@@ -216,6 +323,7 @@ export const CHECK_LOGIN = createAsyncThunk(
             if (body.ok) {
                 localStorage.setItem('token', body.token)
                 return {
+                    ok: body.ok,
                     userId: body.userId,
                     userFirstName: body.userFirstName,
                     tokenInitDate: new Date().getTime(),
@@ -224,10 +332,9 @@ export const CHECK_LOGIN = createAsyncThunk(
             }
             else {
                 return {
-                    payload: {
-                        token: '',
-                        ok: ""
-                    }
+                    token: '',
+                    ok: "",
+                    userId: '',
                 }
             }
 
@@ -250,17 +357,19 @@ export const CHECK_LOGIN = createAsyncThunk(
 export const GET_USER_CART = createAsyncThunk(
     'GET_USER_CART', async (id) => {
         try {
-            const response = await fetch(`${REACT_APP_APIURL}payments/order/carrito/${id}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'x-token': localStorage.getItem('token')
-                    }
-                })
-            const body = await response.json();
-            return await body
+            let token = localStorage.getItem('token')
+            if (token) {
+                const response = await fetch(`${REACT_APP_APIURL}payments/order/carrito/${id}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'x-token': localStorage.getItem('token')
+                        }
+                    })
+                const body = await response.json();
+                return await body
+            }
         } catch (error) {
-            console.log(error);
         }
     }
 )
@@ -303,7 +412,6 @@ export const CREATE_USER_CART = createAsyncThunk(
             return body
         }
         catch (e) {
-            console.log(e);
         }
     }
 )
@@ -347,7 +455,6 @@ export const UPDATE_USER_CART = createAsyncThunk(
             return body
         }
         catch (e) {
-            console.log(e);
         }
     })
 //* ELIMINAR UNA UNIDAD DE UN PRODUCTO DEL CARRITO DE USUARIO
@@ -398,7 +505,6 @@ export const REMOVE_ONE_USER_CART = createAsyncThunk(
             return body
         }
         catch (e) {
-            console.log(e);
         }
     })
 //*AGREGAR UNA UNIDAD DE PRODUCTO AL CARRITO DE USUARIO
@@ -433,7 +539,6 @@ export const ADD_ONE_USER_CART = createAsyncThunk('ADD_ONE_USER_CART', async (da
         return body
     }
     catch (e) {
-        console.log(e);
     }
 })
 export const DELETE_USER_CART = createAsyncThunk('DELETE_USER_CART', async (data) => {
@@ -452,11 +557,9 @@ export const DELETE_USER_CART = createAsyncThunk('DELETE_USER_CART', async (data
                 orderId: "",
             }
         } else {
-            console.log(res)
         }
     }
     catch (e) {
-        console.log(e);
     }
 
 })
@@ -501,7 +604,6 @@ export const DELETE_PRODUCT_USER = createAsyncThunk('DELETE_PRODUCT_USER', async
         return body
     }
     catch (e) {
-        console.log(e);
     }
 })
 
@@ -516,12 +618,94 @@ export const POST_USER_ADDRESS = createAsyncThunk('POST_USER_ADDRESS', async (da
             },
             body: JSON.stringify({
                 userId: data.userId,
-                addressComment: data.addressComment,
                 orderId: data.orderId,
+                addressStreet: data.values.addressStreet,
+                addressNumber: data.values.addressNumber,
+                addressFloor: data.values.addressFloor,
+                addressFlat: data.values.addressFlat,
+                addressCity: data.values.addressCity,
+                addressZipCode: data.values.addressZipCode,
+                addressProvince: data.values.addressProvince,
+                addressComment: data.values.addressComment,
+                addressIsShipping: true,
+                addressIsBilling: true,
             })
         })
+        const body = await resp.json();
+        return body
+
     }
     catch (e) {
-        console.log(e);
     }
 })
+export const LOG_OUT = createAction(
+    "LOG_OUT", () => {
+        localStorage.removeItem('token')
+        localStorage.removeItem('cart')
+        localStorage.removeItem('totalCart')
+        return {
+            ok: ""
+        }
+    }
+)
+
+export const GET_FAQS = createAsyncThunk(
+    'GET_FAQS', async (id) => {
+        const response = await fetch(`${REACT_APP_APIURL}faqs`)
+        return await response.json()
+    }
+)
+
+export const SEARCH_BY_ID = createAsyncThunk("SEARCH_BY_ID", async (id) => {
+    try {
+        const res = await axios.get(`${REACT_APP_APIURL}users/${id}`)
+        console.log(res)
+        return res.data
+    } catch (e) {
+        console.log(e)
+    }
+})
+
+export const SEARCH_DIRECTION_BY_ID = createAsyncThunk("SEARCH_DIRECTION_BY_ID", async (id) => {
+    try {
+        let token = localStorage.getItem("token");
+        if (token) {
+            const res = await fetch(`${REACT_APP_APIURL}address/byUser/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-token': token
+                }
+            })
+            let resjson = await res.json()
+            console.log(resjson)
+            return resjson
+        } else {
+            return {
+                ok: false,
+                msg: "El usuario no esta logeado"
+            }
+        }
+
+    } catch (e) {
+        console.log(e)
+    }
+})
+export const GET_WISHES = createAsyncThunk("GET_WISHES", async (id) => {
+    try {
+        let token = localStorage.getItem("token");
+        if (token) {
+            const res = await fetch(`${REACT_APP_APIURL}wishList/getByUser/${id}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-token': token
+                }
+            })
+            let body = await res.json()
+            return body
+        }
+    }
+    catch (e) {
+        console.log(e)
+    }
+})
+

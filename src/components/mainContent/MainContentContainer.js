@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { CHECK_LOGIN, GET_USER_CART, SET_CART, SET_TOTAL } from '../../redux/actions'
+import { CHECK_LOGIN, GET_USER_CART, GET_WISHES, SET_CART, SET_TOTAL } from '../../redux/actions'
+import Highlight from '../highlight/Highlight'
 import Filters from './Filters'
 import ProductCardContainer from './ProductCardContainer'
 
@@ -13,11 +14,14 @@ const MainContentContainer = () => {
       dispatch(CHECK_LOGIN())
       if (userId) {
         dispatch(GET_USER_CART(userId))
+        dispatch(GET_WISHES(userId))
+
+
       }
     } else {
       let cartStorage = localStorage.getItem('cart')
       let totalCartStorage = localStorage.getItem('totalCart')
-      if (cartStorage && totalCartStorage) {
+      if (cartStorage && totalCartStorage && totalCartStorage != "undefined") {
         let cartStorageParsed = JSON.parse(cartStorage)
         let totalCartStorageParsed = JSON.parse(totalCartStorage)
         dispatch(SET_CART(cartStorageParsed))
@@ -27,11 +31,17 @@ const MainContentContainer = () => {
 
   }, [userId])
 
+
   return (
-    <div style={{ display: "flex" }}>
-      <Filters />
-      <ProductCardContainer />
+    <div>
+      <Highlight />
+      <div style={{ display: "flex" }}>
+        <Filters />
+        <ProductCardContainer />
+      </div>
+
     </div>
+
   )
 }
 

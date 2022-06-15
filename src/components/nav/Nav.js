@@ -4,10 +4,11 @@ import Logo from '../../images/Logo-GoBew.png'
 import Carrito from '../../images/carrito-compras.png'
 import User from '../../images/user-icon.png'
 import { Link } from 'react-router-dom'
-import { CHECK_LOGIN, GET_USER_CART, SET_CART, SET_TOTAL } from '../../redux/actions';
+import { CHECK_LOGIN, GET_USER_CART, GET_WISHES, SET_CART, SET_TOTAL } from '../../redux/actions';
+import LogOut from '../login/LogOut';
 
 const Nav = () => {
-    const { userResponse, cart, userId } = useSelector(store => store.clientReducer)
+    const { userResponse, cart, userId, userFirstName } = useSelector(store => store.clientReducer)
     const dispatch = useDispatch()
     useEffect(() => {
         let token = localStorage.getItem('token')
@@ -15,12 +16,16 @@ const Nav = () => {
             if (userId) {
                 dispatch(CHECK_LOGIN());
                 dispatch(GET_USER_CART(userId))
+                dispatch(GET_WISHES(userId))
+
             }
         } else {
 
             let cartStorage = localStorage.getItem('cart')
             let totalCartStorage = localStorage.getItem('totalCart')
-            if (cartStorage && totalCartStorage) {
+
+            if (cartStorage && totalCartStorage && totalCartStorage != "undefined") {
+
                 let cartStorageParsed = JSON.parse(cartStorage)
                 let totalCartStorageParsed = JSON.parse(totalCartStorage)
                 dispatch(SET_CART(cartStorageParsed))
@@ -30,11 +35,6 @@ const Nav = () => {
 
     }, [userId])
 
-    if (userResponse.ok === true) {
-        var user = userResponse.userFirstName
-    } else {
-        user = 'Acceso'
-    }
     return (
         <nav className='nav'>
             {/* //! LOGO */}
@@ -44,12 +44,6 @@ const Nav = () => {
                 </Link>
             </div>
             {/* //! FILTERS */}
-            {/* <div className='nav__filters'> */}
-            {/* CATEGORIES FILTERS */}
-            {/* {showCategories && <CategoriesContainer />} */}
-            {/* SEARCHBAR */}
-            {/* {showSearch && <SearchBar />} */}
-            {/* </div> */}
             <div className='nav__loginCart'>
                 {/* //! CART */}
                 <Link className='nav__loginCart--cart' to="/cart">
@@ -59,15 +53,13 @@ const Nav = () => {
                     </div>
                 </Link>
                 {/* //! LOGIN */}
-                <Link className='nav__loginCart--login' to={`/login`} >
-                    <img className='nav__loginCart--login-img' src={User} alt='img not found' />
-                    <p className='nav__loginCart--login-text'>{user}</p>
-                </Link>
+                {userResponse.ok ? <LogOut user={userFirstName} User={User} />
+                    : <Link className='nav__loginCart--login' to={`/login`} >
+                        <img className='nav__loginCart--login-img' src={User} alt='img not found' />
+                        <p className='nav__loginCart--login-text'>Acceso</p>
+                    </Link>
+                }
             </div>
-            {/* ORDERING */}
-            {/* <OrderinContainer /> */}
-            {/* HIGHLITED PRODUCTS */}
-            {/* <HighLightedBtn /> */}
         </nav>
     )
 }
