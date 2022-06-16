@@ -15,7 +15,6 @@ const MainContentContainer = () => {
       if (userId) {
         dispatch(GET_USER_CART(userId))
         dispatch(GET_WISHES(userId))
-
       }
     } else {
       let cartStorage = localStorage.getItem('cart')
@@ -36,6 +35,7 @@ const MainContentContainer = () => {
   }, []);
 
 
+
   return (
     <div>
       <div className='MainContent'>
@@ -46,6 +46,7 @@ const MainContentContainer = () => {
         </div>
       </div>
     </div>
+
   )
 }
 
