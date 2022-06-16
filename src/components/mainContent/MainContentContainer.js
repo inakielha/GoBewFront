@@ -35,7 +35,6 @@ const MainContentContainer = () => {
   }, []);
 
 
-
   return (
     <div>
       <div className='MainContent'>
@@ -46,7 +45,6 @@ const MainContentContainer = () => {
         </div>
       </div>
     </div>
-
   )
 }
 
