@@ -75,6 +75,7 @@ export const ChangePassword = () => {
       } else {
         setOk({ ok: false, msg: 'Usuario no encontrado' })
       }
+
     } catch (error) {
       setOk({ ok: false, msg: 'Ha ocurrido un error, por favor intente nuevamente.' })
     }

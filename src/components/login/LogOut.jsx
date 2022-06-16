@@ -1,3 +1,4 @@
+
 import react, { useState } from "react"
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux"
@@ -6,6 +7,7 @@ import { LOG_OUT, SEARCH_BY_ID } from "../../redux/actions";
 
 export default function LogOut({ userId,User}) {
     const {userAllInfo , userFirstName} = useSelector(store => store.clientReducer);
+
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const [clickUser, setClickUser] = useState(false)

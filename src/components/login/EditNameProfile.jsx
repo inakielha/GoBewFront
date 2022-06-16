@@ -21,26 +21,6 @@ export default function EditNameProfile() {
   })
   const [check, setcheck] = useState(false)
 
-  // const changeName = async (userFirstName,userLastName) => {
-  //   try {
-  //     const objUser = {
-  //       userId,
-  //       userFirstName,
-  //       userLastName
-  //     }
-  //     console.log(objUser)
-  //     const res = await axios.put(`${REACT_APP_APIURL}users/`,objUser);
-  //     const data = res.data
-  //     if(data.ok){
-  //       alert("Su nombre fue modificado con exito")
-  //     } else {
-  //       setOk({ok: false, msg: 'Usuario no encontrado'})
-  //     }
-  //   } catch (e) {
-  //     console.log(e)
-  //   }
-  // }
-
   useEffect(() => {
     dispatch(CHECK_LOGIN())
     dispatch(SEARCH_BY_ID(userId))

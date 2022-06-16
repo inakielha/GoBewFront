@@ -33,6 +33,7 @@ export default function UserProfile() {
                         {/* <Link to={`/profile/editName/${userId}`}>
                             Editar nombre
                         </Link> */}
+
                     </div>
                     <div className="userProfile__address">
                         {userDirection?.addresses?.length ? userDirection.addresses.map((element, index) =>
@@ -55,5 +56,6 @@ export default function UserProfile() {
                 : <h3>Loading...</h3>}
         </div>
     </>
+
     )
 }

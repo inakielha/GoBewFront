@@ -73,6 +73,7 @@ export const RememberPassword = () => {
               <TextInput name='userEmail' type='email' placeholder='e-mail' />
               <button type="submit">Enviar</button>
               {usuarioDeGoogle && <p>{usuarioDeGoogle} </p>}
+
             </Form>
           </section>
         )}
@@ -80,3 +81,4 @@ export const RememberPassword = () => {
     </div>
   )
 };
+
