@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { CHECK_LOGIN, GET_USER_CART, GET_WISHES, SET_CART, SET_TOTAL } from '../../redux/actions'
+import { CHECK_LOGIN, GET_USER_CART, GET_WISHES, SEARCH_BY_ID, SET_CART, SET_TOTAL } from '../../redux/actions'
 import Highlight from '../highlight/Highlight'
 import Filters from './Filters'
 import ProductCardContainer from './ProductCardContainer'
 
 const MainContentContainer = () => {
   const dispatch = useDispatch()
-  const { userId } = useSelector(state => state.clientReducer)
+  const { userId, isFiltered } = useSelector(state => state.clientReducer)
   useEffect(() => {
     let token = localStorage.getItem('token')
     if (token) {
@@ -15,8 +15,6 @@ const MainContentContainer = () => {
       if (userId) {
         dispatch(GET_USER_CART(userId))
         dispatch(GET_WISHES(userId))
-
-
       }
     } else {
       let cartStorage = localStorage.getItem('cart')
@@ -30,16 +28,23 @@ const MainContentContainer = () => {
     }
 
   }, [userId])
+  useEffect(() => {
+    if (userId) {
+      dispatch(SEARCH_BY_ID(userId))
+    }
+  }, []);
+
 
 
   return (
     <div>
-      <Highlight />
-      <div style={{ display: "flex" }}>
+      <div className='MainContent'>
         <Filters />
-        <ProductCardContainer />
+        <div>
+          {!isFiltered && <Highlight />}
+          <ProductCardContainer />
+        </div>
       </div>
-
     </div>
 
   )
